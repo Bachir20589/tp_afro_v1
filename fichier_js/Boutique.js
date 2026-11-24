@@ -1,27 +1,35 @@
 import { Produit } from "../fichier_js/Produit.js";
-import { Panier } from "../fichier_js/Panier.js";
 
 export class Boutique {
-    constructor(selecteur, donnees) {
+    constructor(selecteur, donnees, panier) {
         this.conteneur = document.querySelector(selecteur);
         this.produits = donnees.map(d => new Produit(d));
+        this.panier = panier;
+
+        this.conteneur.addEventListener("click", e => {
+            const bouton = e.target.closest(".bouton_plus, .bouton_moins");
+            if (!bouton) return;
+            const id = Number(bouton.closest(".cadres").dataset.id);
+            const produit = this.produits.find(p => p.id === id);
+            if (bouton.classList.contains("bouton_plus")) {
+                this.panier.ajouter(produit);
+            } else {
+                this.panier.retirer(produit);
+            }
+        });
+
+        this.panier.surChangement(() => this.synchroniserQuantites());
     }
 
     afficher() {
-        let html = ``;
-        for (const produit of this.produits) {
-            html += produit.toHTML();
-        }
-        this.conteneur.innerHTML = html;
-        this.activerBoutons();
+        this.conteneur.innerHTML = this.produits.map(p => p.toHTML()).join("");
+        this.synchroniserQuantites();
     }
 
-    activerBoutons() {
-        this.conteneur.querySelectorAll(".bouton_plus").forEach(btn => {
-            btn.addEventListener("click", () => Panier.ajouter(btn, 1));
-        });
-        this.conteneur.querySelectorAll(".bouton_moins").forEach(btn => {
-            btn.addEventListener("click", () => Panier.retirer(btn, 1));
+    synchroniserQuantites() {
+        this.conteneur.querySelectorAll(".cadres").forEach(carte => {
+            carte.querySelector(".quantite").textContent =
+                this.panier.quantite(Number(carte.dataset.id));
         });
     }
 }

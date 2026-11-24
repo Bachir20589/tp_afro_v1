@@ -7,14 +7,22 @@ export class Produit {
         this.url = url;
     }
 
+    static formater(montant) {
+        return montant.toLocaleString("fr-FR") + " CFA";
+    }
+
+    get prixFormate() {
+        return Produit.formater(this.prix);
+    }
+
     toHTML() {
         return `
         <div class="cadres" data-id="${this.id}">
-            <img src="${this.url}" alt="${this.nom}"></img>
+            <img src="${this.url}" alt="${this.nom}">
             <h3>${this.nom}</h3>
-            <p>Prix: ${this.prix}</p>
-            <p>Categorie: ${this.categorie}</p><br>
-            <button class="bouton_plus">+</button> <span>0</span>
+            <p>Prix : ${this.prixFormate}</p>
+            <p>Catégorie : ${this.categorie}</p><br>
+            <button class="bouton_plus">+</button> <span class="quantite">0</span>
             <button class="bouton_moins">-</button>
         </div>
     `;
